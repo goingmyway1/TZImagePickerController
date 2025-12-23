@@ -927,6 +927,17 @@ static CGFloat itemMargin = 5;
         if (interactivePop && CGRectGetMinX(_collectionView.bounds) + 44 > location.x && interactivePop.state == UIGestureRecognizerStatePossible) {
             return NO;
         }
+        // Only begin pan-to-select when the gesture is predominantly horizontal.
+        // This avoids starting selection while the user is scrolling vertically.
+        if ([_panGesture isKindOfClass:[UIPanGestureRecognizer class]]) {
+            CGPoint velocity = [(UIPanGestureRecognizer *)_panGesture velocityInView:_collectionView];
+            CGFloat absX = fabs(velocity.x);
+            CGFloat absY = fabs(velocity.y);
+            // If vertical velocity dominates, don't begin pan selection.
+            if (absY > absX) {
+                return NO;
+            }
+        }
         return YES;
     }
     return YES;
